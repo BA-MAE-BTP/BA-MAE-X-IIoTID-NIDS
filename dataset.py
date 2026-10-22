@@ -317,9 +317,9 @@ class XIIoTIDDataModule:
                 standardize=True,
             )
             self.pca_selector.fit(X_train_normal, feature_names=self.raw_feature_names)
-            self.X_train_pca = self.pca_selector.transform(X_train_raw)
-            self.X_val_pca = self.pca_selector.transform(X_val_raw)
-            self.X_test_pca = self.pca_selector.transform(X_test_raw)
+            raw_tr = self.pca_selector.transform(X_train_raw)
+            raw_val = self.pca_selector.transform(X_val_raw)
+            raw_test = self.pca_selector.transform(X_test_raw)
             self.selected_feature_names = self.pca_selector.selected_feature_names_
         else:
             from sklearn.preprocessing import StandardScaler
@@ -334,14 +334,19 @@ class XIIoTIDDataModule:
             ranking_scores = np.sum(np.abs(loadings_m), axis=0)
             sorted_idx = np.argsort(-ranking_scores)[:self.k_pca]
 
-            X_tr_sc = scaler.transform(X_train_raw)
-            X_v_sc = scaler.transform(X_val_raw)
-            X_te_sc = scaler.transform(X_test_raw)
-
-            self.X_train_pca = X_tr_sc[:, sorted_idx].astype(np.float32)
-            self.X_val_pca = X_v_sc[:, sorted_idx].astype(np.float32)
-            self.X_test_pca = X_te_sc[:, sorted_idx].astype(np.float32)
+            raw_tr = X_train_raw[:, sorted_idx]
+            raw_val = X_val_raw[:, sorted_idx]
+            raw_test = X_test_raw[:, sorted_idx]
             self.selected_feature_names = [self.raw_feature_names[i] for i in sorted_idx]
+
+        # Standardize the 31 features strictly on normal training data (zero-leakage)
+        from sklearn.preprocessing import StandardScaler
+        feature_scaler = StandardScaler()
+        feature_scaler.fit(raw_tr[normal_mask])
+
+        self.X_train_pca = np.clip(feature_scaler.transform(raw_tr), -10.0, 10.0).astype(np.float32)
+        self.X_val_pca = np.clip(feature_scaler.transform(raw_val), -10.0, 10.0).astype(np.float32)
+        self.X_test_pca = np.clip(feature_scaler.transform(raw_test), -10.0, 10.0).astype(np.float32)
 
         logger.info(f"Extracted {self.X_train_pca.shape[1]} PCA features.")
         logger.info(f"Top 5 selected features: {self.selected_feature_names[:5]}")

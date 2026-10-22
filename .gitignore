@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Raw dataset files & archives
+*.csv
+!alpha_0.35_blocks_xiiotid.csv
+*.zip
+*.tar.gz
+*.parquet
+
+# NumPy split arrays and feature caches
+*.npy
+*.npz
+
+# Model checkpoints and weights
+*.pt
+*.pth
+*.joblib
+*.pkl
+
+# Logs, outputs, and experiment runs
+*.log
+runs/
+experiments/
+logs/
+checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Machine-specific config overrides
+local_paths.yaml

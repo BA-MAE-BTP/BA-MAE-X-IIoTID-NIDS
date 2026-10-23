@@ -1,8 +1,8 @@
-# EXPERIMENT_LEDGER.md — Controlled Evaluation Ladder (E1 to E4)
+# EXPERIMENT_LEDGER.md — Controlled Evaluation Ladder (50 Epochs Full Benchmark)
 
 **Research Project**: BA-MAE for Industrial IoT NIDS on X-IIoTID Benchmark  
 **Benchmark Baseline**: SAFE (arXiv:2502.07119) Alignment  
-**Evaluation Cohort**: 5 Fixed Random Seeds (42, 43, 44, 45, 46) | 164,167 Test Samples  
+**Evaluation Cohort**: 5 Fixed Random Seeds (42, 43, 44, 45, 46) | 164,167 Test Samples | Matched Budget (50 Epochs)  
 
 ---
 
@@ -34,7 +34,7 @@
 
 | Hypothesis & Comparison | Metric Diff (Mean) | Paired 95% Bootstrap CI | McNemar's chi2 | McNemar p-value | Significant (alpha=0.01)? |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| **H1: Huber Robustness (E3 vs. E2)** | -2.45% | [-6.93%, +1.07%] | 61.78 | 3.8490e-15 | **True** |
+| **H1: Huber Robustness (E3 vs. E2)** | -2.45% | [-7.03%, +1.07%] | 61.78 | 3.8490e-15 | **True** |
 | **H2: Block-Aware Schedule (E4 vs. E4-ctrl)** | -3.52% | [-10.75%, +3.72%] | 2967.10 | 0.0000e+00 | **True** |
 
 ---
@@ -43,11 +43,11 @@
 
 | Strata Cohort | Volume Percentile | Test Samples | F1-Score | ROC-AUC | Precision | Recall | FPR |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Body (0-50%)** | Specified quantile | 82,375 | 6.49% | 47.37% | 42.54% | 3.51% | 4.47% |
-| **Light (50-75%)** | Specified quantile | 41,318 | 16.70% | 55.53% | 85.64% | 9.25% | 3.60% |
-| **Moderate (75-90%)** | Specified quantile | 24,062 | 20.08% | 63.94% | 54.24% | 12.32% | 5.43% |
-| **Heavy (90-99%)** | Specified quantile | 14,770 | 28.38% | 72.25% | 38.89% | 22.34% | 7.87% |
-| **Extreme (>99%)** | Specified quantile | 1,642 | 28.90% | 75.55% | 24.68% | 34.86% | 7.57% |
+| **Body (0-50%)** | Specified quantile | 82,375 | 14.15 +/- 6.48% | 51.72 +/- 3.82% | 58.97 +/- 11.84% | 8.12 +/- 3.98% | 4.57 +/- 0.14% |
+| **Light (50-75%)** | Specified quantile | 41,318 | 21.06 +/- 4.24% | 55.63 +/- 2.41% | 88.46 +/- 2.22% | 12.01 +/- 2.71% | 3.48 +/- 0.15% |
+| **Moderate (75-90%)** | Specified quantile | 24,062 | 19.40 +/- 2.57% | 59.82 +/- 4.28% | 53.32 +/- 3.60% | 11.87 +/- 1.75% | 5.37 +/- 0.09% |
+| **Heavy (90-99%)** | Specified quantile | 14,770 | 24.18 +/- 2.55% | 66.67 +/- 3.41% | 35.20 +/- 2.39% | 18.45 +/- 2.35% | 7.57 +/- 0.41% |
+| **Extreme (>99%)** | Specified quantile | 1,642 | 21.11 +/- 4.95% | 68.29 +/- 5.57% | 17.68 +/- 4.30% | 26.24 +/- 5.91% | 8.73 +/- 0.82% |
 
 ---
 

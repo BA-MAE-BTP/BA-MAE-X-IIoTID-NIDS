@@ -88,6 +88,25 @@ class TabularMLPEncoder(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
+    def forward_multiscale(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Extract multi-scale representations:
+        Layer 2 output (256-d) and Bottleneck Layer output (128-d).
+        net layers:
+          0: Linear(input_dim, 256), 1: LayerNorm, 2: GELU, 3: Dropout
+          4: Linear(256, 256), 5: LayerNorm, 6: GELU, 7: Dropout (Layer 2)
+          8: Linear(256, 256), 9: LayerNorm, 10: GELU, 11: Dropout
+          12: Linear(256, 128), 13: LayerNorm, 14: GELU, 15: Dropout (Bottleneck)
+        """
+        # Block 1
+        x1 = self.net[3](self.net[2](self.net[1](self.net[0](x))))
+        # Block 2 (Layer 2 representation)
+        x2 = self.net[7](self.net[6](self.net[5](self.net[4](x1))))
+        # Block 3
+        x3 = self.net[11](self.net[10](self.net[9](self.net[8](x2))))
+        # Block 4 (Bottleneck representation)
+        x4 = self.net[15](self.net[14](self.net[13](self.net[12](x3))))
+        return x2, x4
+
 
 class TabularMLPDecoder(nn.Module):
     """Decoder mapping latent representation (128) back to tabular space (31).
@@ -160,6 +179,15 @@ class TabularMAE(nn.Module):
         """Extract bottleneck representation z with mask=0 (all features visible)."""
         self.eval()
         return self.encoder(x)
+
+    @torch.no_grad()
+    def extract_multiscale_latents(self, x: torch.Tensor) -> torch.Tensor:
+        """Extract concatenated multi-scale representation z_multi in R^384.
+        Concat Layer 2 (256-d) + Bottleneck Layer (128-d).
+        """
+        self.eval()
+        l2, bottleneck = self.encoder.forward_multiscale(x)
+        return torch.cat([l2, bottleneck], dim=-1)
 
 
 class MLPProbeClassifier(nn.Module):

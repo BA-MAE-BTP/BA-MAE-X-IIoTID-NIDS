@@ -1,9 +1,7 @@
 # BA-MAE: Block-Aware Masked Autoencoder for Industrial IoT Intrusion Detection
 
 **Bachelor Technology Project (BTP)**  
-**Indian Institute of Information Technology (IIIT), Pune**  
-**Author**: Lead ML Engineer & Cybersecurity Researcher  
-**Advisor**: Dr. Shivangi Shukla  
+**Indian Institute of Information Technology (IIIT), Pune**    
 **Benchmark Dataset**: X-IIoTID Intrusion Detection Benchmark (Al-Hawawreh et al., 2022)  
 **Baseline Alignment**: SAFE Framework (arXiv:2502.07119)  
 

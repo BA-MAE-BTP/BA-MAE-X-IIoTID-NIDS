@@ -56,3 +56,36 @@
 2. **Huber Loss Robustness (E3 vs E2)**: Masked Huber Loss (delta=1.0) achieves higher anomaly detection precision by attenuating quadratic penalties from heavy-tailed network outliers.
 3. **Tail-Aware Masking (E4 vs E4-control)**: Stratum-dependent masking schedules that dynamically increase masking budget on extreme traffic yield significant performance improvements over random schedules.
 4. **Exact Split & Paper Alignment**: 100% SHA256 integrity match with handoff split indices ensuring seamless reproducibility against the SAFE baseline.
+
+
+---
+
+## 5. Strategy 2 Multi-Scale Latent Benchmark & Ensembling (Arm E4)
+
+### 5.1 Multi-Scale Feature Representation ($\mathbb{R}^{384}$) & Strategy 2 Ensemble (IForest-500 + KNN-20)
+- **Pretraining**: 50 Epochs, AdamW ($lr=1\times10^{-4}, wd=1\times10^{-3}$), Dropout $p=0.15$, Masked Huber Loss ($\delta=1.0$).
+- **Latent Extraction**: Concat Layer 2 (256-d) + Bottleneck (128-d) $\implies \mathbf{z}_{\text{multi}} \in \mathbb{R}^{384}$.
+- **Ensemble Detector**: $0.6 \times \text{MinMax}(\text{IForest}_{500}) + 0.4 \times \text{MinMax}(\text{KNN}_{20})$.
+
+| Pipeline Configuration | F1-Score | Macro-F1 | Precision | Recall | ROC-AUC | PR-AUC | FPR |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Ensemble (Global T95)** | 47.04 +/- 15.63% | 60.21 +/- 9.46% | 80.79 +/- 10.58% | 34.03 +/- 12.74% | 80.09 +/- 2.69% | 74.57 +/- 4.72% | 6.13 +/- 0.07% |
+| **Ensemble (Stratum-Wise T95)** | **54.21 +/- 13.40%** | **64.69 +/- 8.32%** | **84.51 +/- 6.45%** | **40.71 +/- 11.95%** | **80.09 +/- 2.69%** | **74.57 +/- 4.72%** | **6.22 +/- 0.12%** |
+
+### 5.2 Generalization & Overfitting Guardrail Checks
+| Seed | Validation F1 | Test F1 | Delta (\|Val - Test\|) | Guardrail Status (< 1.0%) |
+|:---:|:---:|:---:|:---:|:---:|
+| **42** | 64.14% | 64.07% | 0.08% | **PASSED** |
+| **43** | 60.48% | 60.46% | 0.02% | **PASSED** |
+| **44** | 27.90% | 27.66% | 0.24% | **PASSED** |
+| **45** | 58.77% | 58.61% | 0.17% | **PASSED** |
+| **46** | 60.43% | 60.26% | 0.16% | **PASSED** |
+
+### 5.3 Stratified Evaluation Across Flow-Volume Strata (Arm E4 Multi-Scale)
+| Volume Stratum | F1-Score | Precision | Recall | ROC-AUC | FPR |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Body (0-50%)** | 50.01 +/- 16.39% | 81.44 +/- 10.87% | 37.02 +/- 13.51% | 82.04 +/- 2.15% | 6.26 +/- 0.13% |
+| **Light (50-75%)** | 64.41 +/- 12.77% | 94.53 +/- 2.10% | 49.94 +/- 12.74% | 86.82 +/- 2.15% | 6.06 +/- 0.15% |
+| **Moderate (75-90%)** | 46.63 +/- 7.08% | 73.74 +/- 4.67% | 34.29 +/- 6.46% | 77.50 +/- 1.57% | 6.18 +/- 0.15% |
+| **Heavy (90-99%)** | 23.02 +/- 3.81% | 37.09 +/- 4.48% | 16.72 +/- 3.09% | 70.90 +/- 2.87% | 6.28 +/- 0.24% |
+| **Extreme (>99%)** | 26.35 +/- 7.23% | 23.99 +/- 6.38% | 29.36 +/- 8.51% | 79.62 +/- 2.01% | 6.56 +/- 0.75% |

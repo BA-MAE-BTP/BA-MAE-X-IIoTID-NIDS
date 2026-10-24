@@ -10,6 +10,7 @@ __pycache__/
 *.zip
 *.tar.gz
 *.parquet
+!ladder/eval/E4_multiscale_ensemble_scores.parquet
 
 # NumPy split arrays and feature caches
 *.npy
